@@ -28,4 +28,6 @@ def k_poly2(x,y):
 
 def dk_poly2(x,y):
     return 2 * np.dot(y,y) * x
+
+a = 1
     
