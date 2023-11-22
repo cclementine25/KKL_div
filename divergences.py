@@ -42,34 +42,136 @@ def log_ou_0(t):
     return t_log
 
 
-def KKL(x, y, k):
-    #x~q, y~p
-    n = len(x)
-    Kx = 1/n * np.array([[k(x[i],x[j]) for i in range(n)] for j in range(n)])
-    Ky = 1/n * np.array([[k(y[i],y[j]) for i in range(n)] for j in range(n)])
-    Lambdx,_ = np.linalg.eig(Kx)
-    Lambdx = np.real(Lambdx)
-    Lambdy,Py = np.linalg.eig(Ky)
-    Lambdy = np.real(Lambdy)
-    logDy = np.diag(log_ou_0(Lambdy)) 
-    
-    trxx = np.sum(Lambdx * log_ou_0(Lambdy)) #Tr Sigma_q log Sigma_q
-    trxy = np.trace(Kx @ Py @ logDy @ Py.transpose())  # Tr Sigma q log Sigma p
-    return trxx - trxy 
 
+
+# def KKL(x,y,k):
+#     n = len(x)
+#     m = len(y)
+#     Kx = 1/n * np.array([[k(x[i],x[j]) for i in range(n)] for j in range(n)])
+#     Ky = 1/m * np.array([[k(y[i],y[j]) for i in range(m)] for j in range(m)])
+#     regx = 1e-9*np.eye(n)
+#     regy = 1e-9*np.eye(m)
+#     Kx = Kx +regx
+#     Ky = Ky+regy
+#     Lx,U = np.linalg.eig(Kx)
+#     U = np.real(U).transpose()
+#     Lx = np.real(Lx)
+#     Ly,V = np.linalg.eig(Ky)
+#     V = np.real(V).transpose()
+#     Ly = np.real(Ly)
+#     Trxy = 0
+#     Kxy = np.array([[k(x[i],y[j]) for j in range(m)] for i in range(n)])
+#     Trxx = np.sum(Lx * log_ou_0(Lx))
+#     for s in range(n):
+#         for t in range(m):
+#             Trxy = Trxy + (Lx[s] * log_ou_0([Ly[t]])[0] * (U[s] @ Kxy @ V[t])**2) / ((U[s] @ (n * Kx) @ U[s]) * (V[t] @ (m*Ky) @ V[t]))
+#             # if n*Lx[s] != (U[s] @ (n * Kx) @ U[s]):
+#             #     print((U[s] @ (n * Kx) @ U[s]) / (n*Lx[s]))
+#                 #print(U[s])#np.abs((U[s] @ Kxy @ V[t])**2 / ((U[s] @ (n * Kx) @ U[s]) * (V[t] @ (m * Ky) @ V[t]))) > 0: #(n*Lx[s]*m*Ly[t])) > 1:#
+#                 # print(" n x lambda_x = " + str(n*Lx[s]))
+#                 # print("m x lambda_y = " + str(m*Ly[t]))
+#                 # print(" produit scalire = " + str((U[s] @ Kxy @ V[t])**2))
+#                 # print("norme^2 de f = " + str((U[s] @ (n * Kx) @ U[s])))
+#                 # print("norme^2 de g = " + str((V[t] @ (m * Ky) @ V[t])))
+#             #print((U[s] @ Kxy @ V[t])**2 / ((U[s] @ (n * Kx) @ U[s]) * (V[t] @ (m*Ky) @ V[t])))
+            
+#     Trxx = np.sum(Lx * log_ou_0(Lx))
+#     #print(UU)
+#     return Trxx - Trxy
+
+
+# def WGrad_KKL(w,x,y,k,dk):
+#     n = len(x)
+#     m = len(y)
+#     Kx = 1/n * np.array([[k(x[i],x[j]) for i in range(n)] for j in range(n)])
+#     Ky = 1/m * np.array([[k(y[i],y[j]) for i in range(m)] for j in range(m)])
+#     Lx,U = np.linalg.eig(Kx)
+#     U = U.transpose()
+#     Lx = np.real(Lx)
+#     Ly,V = np.linalg.eig(Ky)
+#     V = V.transpose()
+#     Ly = np.real(Ly)
+#     Kwx = np.array([k(w,x[i]) for i in range(n)]).transpose()
+#     Kwy = np.array([k(w,y[j]) for j in range(m)]).transpose()
+#     DKx = np.array([dk(w,x[i]) for i in range(n)]).transpose()
+#     DKy = np.array([dk(w,y[j]) for j in range(m)]).transpose()
+#     Trwx = 0
+#     Trwy = 0 
+#     for s in range(n):
+#         Trwx = Trwx + log_ou_0([Lx[s]])[0] * 2 * (U[s] @ Kwx)* (DKx @ U[s]) / (U[s] @ (n * Kx) @ U[s])
+#         #print(U[s] @ (n * Kx) @ U[s])
+#     for t in range(m):
+#         Trwy = Trwy + log_ou_0([Ly[t]])[0] * 2 * (V[t] @ Kwy)* (DKy @ V[t]) / (V[t] @ (n * Ky) @ V[t])
+#     return Trwx - Trwy
+
+
+def KKL(x,y,k):
+    n = len(x)
+    m = len(y)
+    Kx = 1/n * np.array([[k(x[i],x[j]) for i in range(n)] for j in range(n)])
+    Ky = 1/m * np.array([[k(y[i],y[j]) for i in range(m)] for j in range(m)])
+    regx = 1e-9*np.eye(n)
+    regy = 1e-9*np.eye(m)
+    Kx = Kx +regx
+    Ky = Ky+regy
+    Lx,U = np.linalg.eig(Kx)
+    U = np.real(U).transpose()
+    Lx = np.real(Lx)
+    Ly,V = np.linalg.eig(Ky)
+    V = np.real(V).transpose()
+    Ly = np.real(Ly)
+    Trxy = 0
+    Kxy = np.array([[k(x[i],y[j]) for j in range(m)] for i in range(n)])
+    Trxx = np.sum(Lx * log_ou_0(Lx))
+    for s in range(n):
+        for t in range(m):
+            Trxy = Trxy + log_ou_0([Ly[t]])[0] / Ly[t] * (U[s] @ Kxy @ V[t])**2 
+    Trxx = np.sum(Lx * log_ou_0(Lx))
+    
+    return Trxx - 1/(n*m) * Trxy
+
+
+def WGrad_KKL(w,x,y,k,dk):
+    n = len(x)
+    m = len(y)
+    Kx = 1/n * np.array([[k(x[i],x[j]) for i in range(n)] for j in range(n)])
+    Ky = 1/m * np.array([[k(y[i],y[j]) for i in range(m)] for j in range(m)])
+    Lx,U = np.linalg.eig(Kx)
+    U = U.transpose()
+    Lx = np.real(Lx)
+    Ly,V = np.linalg.eig(Ky)
+    V = V.transpose()
+    Ly = np.real(Ly)
+    Kwx = np.array([k(w,x[i]) for i in range(n)]).transpose()
+    Kwy = np.array([k(w,y[j]) for j in range(m)]).transpose()
+    DKx = np.array([dk(w,x[i]) for i in range(n)]).transpose()
+    DKy = np.array([dk(w,y[j]) for j in range(m)]).transpose()
+    Trwx = 0
+    Trwy = 0 
+    for s in range(n):
+        Trwx = Trwx + log_ou_0([Lx[s]])[0] / Lx[s] * 2 * (U[s] @ Kwx)* (DKx @ U[s]) 
+        #print(U[s] @ (n * Kx) @ U[s])
+    for t in range(m):
+        Trwy = Trwy + log_ou_0([Ly[t]])[0] / Ly[t] * 2 * (V[t] @ Kwy)* (DKy @ V[t]) 
+    return 1/n * Trwx - 1/ m * Trwy
+    
+                                   
+    
+       
+            
 
 
 
 #gradient KKL
 
-def DxK(dk,dkk,x):
-    n = len(x)
-    d = len(x[0])
-    M = np.zeros((((n,n,n,d))))
-    for i in range(n):
-        M[i,:,i] = np.array([dk(x[i],x[l],1) for l in range(n)])
-        M[i,i,i] = dkk(x[i],x[i],1)
-    return M
+# def DxK(dk,dkk,x):
+#     n = len(x)
+#     d = len(x[0])
+#     M = np.zeros((((n,n,n,d))))
+#     for i in range(n):
+#         M[i,:,i] = np.array([dk(x[i],x[l],1) for l in range(n)])
+#         M[i,i,i] = dkk(x[i],x[i],1)
+#     return M
     
 
 

@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt 
+import scipy.stats as scs
 
 import divergences as dv
 import kernels as kl
@@ -29,3 +30,13 @@ def KL(alpha):
 print(KL(alpha))
 print(np.real(dv.KKL(x, y, k)))
 print(np.log(len(alpha) * np.max(alpha)))
+
+m = 40
+#### mixture de gaussienne ####
+MU = np.array([[0,0],[5,0]])
+Z = np.random.choice([0,1],m,p=[1/2,1/2])
+y = np.array([scs.multivariate_normal.rvs(MU[Z[i]],np.identity(2)) for i in range(m)])
+
+
+
+

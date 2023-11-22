@@ -12,7 +12,8 @@ m = 100 # nombre de particules pour q
 #T = 100 # nombre d'itérations
 
 #kernel
-k = lambda x,y : kl.k_gauss(x,y,1)
+sigma = 10
+k = lambda x,y : kl.k_gauss(x,y,sigma)
 #dk = lambda x,y : kl.dk_gauss(x, y, 1)
 
 
@@ -31,7 +32,7 @@ SS = np.array([Sigmax * k for k in [6,5,4,3,2,1]])
 muy = np.array([0,0])
 Ly = np.array([[1/5, -1],[1/2,1/2]])
 Sigmay = Sigmax #Lx @ Lx.transpose()
-Y = scs.multivariate_normal.rvs(muy,Sigmay,n)
+Y = scs.multivariate_normal.rvs(muy,Sigmay,m)
 
 #######################################################
 
@@ -54,31 +55,37 @@ k_trace = []
 fig, axs = plt.subplots(4, 4, figsize=(20,20))
 for j in range(16):
     axs[j//4,j%4].axis([-3,23,-10,30])
+    #YY = Y[np.linalg.norm(Y,axis = 1) > 5/(j+1)]
+    #Ind = np.random.randint(len(YY),size = n)
+    #k_j = lambda x,y : kl.k_gauss(x,y,np.linalg.norm(Mux[j])**(3/4))
     X = scs.multivariate_normal.rvs(Mux[j],Sigmax,n)
+    #X = np.array([YY[i] for i in Ind]) + scs.multivariate_normal.rvs(np.zeros(2),np.identity(2),len(Ind)) #
     mmd.append(dv.MMD(X,Y,k))
     kkl.append(dv.KKL(X,Y,k))
     #k_trace.append(dv.K_trace(X, k) - dv.K_trace(Y, k))
-    kde.append(dv.KDE(X, Y, k))
-    axs[j//4,j%4].scatter(X[:,0],X[:,1],color = "green")
+    #kde.append(dv.KDE(X, Y, k))
     axs[j//4,j%4].scatter(Y[:,0],Y[:,1],color = "blue")
+    axs[j//4,j%4].scatter(X[:,0],X[:,1],color = "red")
+    print(j)
 
     
 
     
 plt.figure()
 plt.plot(mmd,label = "mmd")
+plt.plot(kkl,label = "kkl")
 plt.title("evolution of mmd for 2 distribution of same variance when their means get closer ")
 
 plt.figure()
 plt.plot(kkl,label = "kkl")
 #plt.plot(k_trace,label = "k_trace")
 plt.legend()
-plt.title("kkl / Tr - Tr")
+plt.title("kkl for sigma = " + str(sigma))
 #plt.title("evolution of kkl for 2 distribution of same variance when their means get closer ")
 
-plt.figure()
-plt.plot(kde,label = "kde")
-plt.title("evolution of kde for 2 distribution of same variance when their means get closer ")
+# plt.figure()
+# plt.plot(kde,label = "kde")
+# plt.title("evolution of kde for 2 distribution of same variance when their means get closer ")
 
 
 """ same experience switching the roles of the mean and variance"""
