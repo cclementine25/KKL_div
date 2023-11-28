@@ -15,6 +15,17 @@ def dkk_gauss(x,y,sigma):
 
 ####################################
 
+def k_RBF(x,y,beta):
+    return 1/(1 + np.linalg.norm(x-y))**beta
+
+def dk_RBF(x,y,beta):
+    if x[0] == y[0]:
+        return -2 * beta * (x-y)/ np.linalg.norm(x-y) * k_RBF(x,y,beta + 1)
+    return 0
+
+
+##################################
+
 def k_lin(x,y):
     return np.dot(x,y)
 
