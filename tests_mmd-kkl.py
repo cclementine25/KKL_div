@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 
 import divergences as dv
 import kernels as kl
-import gradient_descent as gd
 import generate_y as gy 
 
 d = 2 #dimension of the particles 

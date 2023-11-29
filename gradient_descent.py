@@ -11,10 +11,8 @@ def gradient_descent(J,dJ,x0,h,eps,n_it_max):
     Grad = []
     while np.linalg.norm(grad) > eps and i < n_it_max:
         liste_J.append(J(x))
-        y = x + 2 * scs.multivariate_normal.rvs(np.zeros(2),np.identity(2),len(x))
+        y = x + 0.1 * scs.multivariate_normal.rvs(np.zeros(2),np.identity(2),len(x))
         grad = dJ(y)
-        if J(x)< 0: 
-            grad = -grad
         Grad.append(np.linalg.norm(grad))
         x = x - h * grad
         X.append(x)
