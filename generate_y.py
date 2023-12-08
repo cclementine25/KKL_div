@@ -5,9 +5,23 @@ import shapes as sh
 
 
 ########################################
-def gaussian(muy,sigmay,n,m):
+def gaussian(muy,sigmay,m):
     y = scs.multivariate_normal.rvs(muy,sigmay,m)
     return y
+
+
+# ###### GAUSSIAN ######
+#initial distribution
+mux = np.array([5,5])
+Lx = np.array([[1/2,1/3],[1/4,-2]])
+Sigmax = Lx @ Lx.transpose()
+#x0 = scs.multivariate_normal.rvs(mux,Sigmax,n)
+
+#Simulation of (Y_i)_i<n ~ p -> objective distribution
+muy = np.array([0,0])
+Ly = np.array([[1/5, -1],[1/2,1/2]])
+Sigmay = Ly @ Ly.transpose()
+#y = scs.multivariate_normal.rvs(muy,Sigmay,m)
 
 #########################################
 
@@ -15,6 +29,9 @@ def mixt_gauss(Muy,Sigmay,py,m):
     Zy = np.random.choice(np.arange(len(py)),m,p=py)
     y = np.array([scs.multivariate_normal.rvs(Muy[Zy[i]],Sigmay[Zy[i]]) for i in range(m)])
     return y
+
+
+MU = np.array([[0,0],[10,0]])
 
 ############################################
 
