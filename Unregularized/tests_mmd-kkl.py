@@ -37,8 +37,8 @@ Sigmay = Sigmax #Lx @ Lx.transpose()
 
 ###Generation of y ###
 y = gy.rings(0.5,2,0.5,1,m)
-x = scs.multivariate_normal.rvs(np.zeros(2),0.2 * np.diag([1,2]),n) 
-
+x = scs.multivariate_normal.rvs(np.zeros(2),0.2 * np.diag([1,2]),n//2) 
+x = np.concatenate([x,x])
 
 ###### Ky ####
 Ky = 1/m * np.array([[k(y[i],y[j],sigm(x,y)) for i in range(m)] for j in range(m)])

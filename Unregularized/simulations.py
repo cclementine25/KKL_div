@@ -13,10 +13,10 @@ import generate_y as gy
 ##############################
 
 d = 2 #dimension of the particles 
-n = 100 # nombre de particules pour q
+n = 30 # nombre de particules pour q
 m = 500 # nombre de particules pour p
 T = 200 # nombre d'itérations
-h = 0.1 # stepsize gradient descent
+h = 0.01 # stepsize gradient descent
 eps = 0.0001
 
 config_y = lambda : gy.rings(1, 1, 0.5, 1, m)
@@ -30,7 +30,7 @@ y = config_y()
 
 
 ### KERNEL ###
-sigm = lambda X,Y : 4 #np.max(np.linalg.norm(X-Y,axis = 1)) / (np.sqrt(1000 * np.log(10))) # np.abs(np.mean(np.linalg.norm(X,axis = 1)) - np.mean(np.linalg.norm(Y,axis = 1)))#max(2,np.linalg.norm(np.mean(x) - np.mean(y)))
+sigm = lambda X,Y : 3 #np.max(np.linalg.norm(X-Y,axis = 1)) / (np.sqrt(1000 * np.log(10))) # np.abs(np.mean(np.linalg.norm(X,axis = 1)) - np.mean(np.linalg.norm(Y,axis = 1)))#max(2,np.linalg.norm(np.mean(x) - np.mean(y)))
 k = lambda x,y,s :  kl.k_gauss(x,y,s)
 dk = lambda x,y,s : kl.dk_gauss(x, y, s)
 
